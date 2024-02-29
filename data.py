@@ -54,7 +54,7 @@ mismatches = mismatches[:-1]
 
 # Variables
 num_specimens = 20
-pairings = {"A" : "C", "C" : "A", "G" : "T", "T" : "G"}
+pairings = {"A" : "T", "T" : "A", "G" : "C", "C" : "G"}
 synthetic_specimens = []
 
 
@@ -73,3 +73,4 @@ for i in range(num_specimens):
       new_specimen = new_specimen[:index] + nucleotide_2 + new_specimen[index + 1:]
   synthetic_specimens.append(new_specimen)
 print("all done!")
+print(len(synthetic_specimens[1]))
