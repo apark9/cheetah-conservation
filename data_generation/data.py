@@ -1,7 +1,15 @@
+# //////////////////////////////////// #
+# DO NOT RUN THIS MORE THAN ONCE       #
+# TO SEE THE RESULTS, SEE SPECIMEN.TXT #
+# //////////////////////////////////// #
+
+
+
 # /////////////////////////////// #
-# STEP 0: IMPORTS                 #
+# STEP 0: IMPORTS AND GLOBALS     #
 # /////////////////////////////// #
 import random
+synthetic_specimens = []
 
 
 # /////////////////////////////// #
@@ -10,7 +18,7 @@ import random
 
 
 # Open the input file
-with open("alignment.txt", "r") as file:
+with open("cheetah-conservation/data_generation/alignment.txt", "r") as file:
     lines = file.readlines()
 def extract_sequence(line):
     return line.split()[2]
@@ -49,6 +57,7 @@ mismatches = mismatches[:-1]
 
 # /////////////////////////////// #
 # STEP 2: CREATE SYNTHETIC        #
+# AND PUT INTO TEXT FILES         #
 # /////////////////////////////// #
 
 
@@ -72,5 +81,12 @@ for i in range(num_specimens):
     else:
       new_specimen = new_specimen[:index] + nucleotide_2 + new_specimen[index + 1:]
   synthetic_specimens.append(new_specimen)
+
+for i in range(num_specimens):   
+   file_name = "cheetah-conservation/data_generation/specimen_" + str(i) + ".txt"
+   with open(file_name, "w") as file:
+      file.write(synthetic_specimens[i])
+      file.close()
+
 print("all done!")
-print(len(synthetic_specimens[1]))
+
