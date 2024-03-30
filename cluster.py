@@ -17,23 +17,18 @@
 # How can we graphically represent the history of making our clusters?
 # Dendrogram
 
+# AgglomerativeClustering object performs a hierarchical clustering using a bottom up approach
 
-# SAMPLEp
 
-import numpy as np
 
-# Import libraries
-import pandas as pd
-import numpy as np
+# IMPORTS
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram
 import matplotlib.pyplot as plt
-from sklearn import datasets
 
-# Import iris data 
-iris = datasets.load_iris()
+# here is some text
+# MODEL 
+# X = data matrix with more than 2 variables
+model = AgglomerativeClustering(affinity='euclidean', linkage='ward')
+clusters = model.fit_predict(X)
 
-iris_data = pd.DataFrame(iris.data)
-iris_data.columns = iris.feature_names
-iris_data['flower_type'] = iris.target
-iris_data.head()
-
-print("here!")
