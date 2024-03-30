@@ -9,7 +9,7 @@
 # STEP 0: IMPORTS AND GLOBALS     #
 # /////////////////////////////// #
 import random
-synthetic_specimens = []
+
 
 
 # /////////////////////////////// #
@@ -69,24 +69,20 @@ synthetic_specimens = []
 
 # Create data
 for i in range(num_specimens):   
-  new_specimen = specimen_full
+  new_specimen = []
   print(i)
   for mismatch in mismatches:
-    index = mismatch[0]
     nucleotide_1 = mismatch[1]
     nucleotide_2 = pairings[nucleotide_1]
     chosen_nucleotide = random.choices(population=[1, 2], weights=[0.8, 0.2],k=1)
     if chosen_nucleotide == 1: 
-      new_specimen = new_specimen[:index] + nucleotide_1 + new_specimen[index + 1:]
+      new_specimen.append(nucleotide_1)
     else:
-      new_specimen = new_specimen[:index] + nucleotide_2 + new_specimen[index + 1:]
+      new_specimen.append(nucleotide_2)
   synthetic_specimens.append(new_specimen)
 
-for i in range(num_specimens):   
-   file_name = "cheetah-conservation/data_generation/specimen_" + str(i) + ".txt"
-   with open(file_name, "w") as file:
-      file.write(synthetic_specimens[i])
-      file.close()
-
-print("all done!")
+# Save to a file
+with open('cheetah-conservation/data_generation/specimens.txt', 'w') as file:
+    for sublist in synthetic_specimens:
+        file.write(' '.join(map(str, sublist)) + '\n')
 
