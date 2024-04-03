@@ -12,18 +12,13 @@ HIGH-LEVEL NOTES
 # 5. repeat: repeat steps 2-4 until stopping criterion is met
 # 6. stopping criterion: number of clusters is equal to the number of clusters specified
 
-'''
-TO FIGURE OUT LATER
-'''
-# understand HiPart / DePDDP
-# have to figure out how to merge parents, how do we select two specific datapoints to merge?
-
 # IMPORTS
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-from HiPart.clustering import DePDDP
-# from sklearn.datasets import make_blobs
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
+from scipy.spatial.distance import squareform
 # from data_generation.data import synthetic_specimens
 
 '''
@@ -31,22 +26,69 @@ SYNTHETIC DATASET
 - take in a set of nucleotide sequences
 - convert to binary encoding
 '''
-# want to generate nucleotides (gene reference) for multiple cheetahs
+
 def generate_nucleotide_sequences(num_sequences, sequence_length):
+
+    # want to generate nucleotides (gene reference) for multiple cheetahs
+    # will remove this function once dataset is generated from features
+
     nucleotides = ['A', 'C', 'G', 'T']
     sequences = [''.join([random.choice(nucleotides) for _ in range(sequence_length)]) 
                  for _ in range(num_sequences)]
     return sequences
 
-def binary_conversion(nucleotide_sequence):
-    binary_map = {'A': [0, 0], 'C': [0, 1], 'G': [1, 0], 'T': [1, 1]}
-    return [bit for nucleotide in nucleotide_sequence for bit in binary_map[nucleotide]]
+def custom_distance_matrix(sequences):
+    # function that counts the number of differences between two sequences
 
-def graph_results(clustered_class, X):
-    plt.scatter([x[0] for x in X], [x[1] for x in X], c=clustered_class)
-    plt.title('Divisive Clustering Results')
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
+    matrix_size = len(sequences)
+    distance_matrix = np.zeros((matrix_size, matrix_size))
+
+    for i, seq1 in enumerate(sequences):
+        for j, seq2 in enumerate(sequences):
+            if i != j:
+                distance_matrix[i][j] = sum(el1 != el2 for el1, el2 in zip(seq1, seq2))
+    return distance_matrix
+
+def calculate_variance(cluster_labels, nucleotides):
+    variance = 0
+    cluster_count = np.unique(cluster_labels)
+
+    for label in cluster_count:
+        cluster_indices = [i for i, cl_label in enumerate(cluster_labels) if cl_label == label]
+        if len(cluster_indices) > 1:
+            cluster = [nucleotides[i] for i in cluster_indices]
+            new_distance_matrix = custom_distance_matrix(cluster)
+            cluster_mean = np.mean(new_distance_matrix)
+            variance += cluster_mean
+
+    return variance
+
+def find_parents(cluster_labels, nucleotides):
+    distance_matrix = custom_distance_matrix(nucleotides)
+    max_distance = 0
+    parents = None
+
+    # Compare sequences from different clusters to find the maximum distance
+    for i in range(len(nucleotides)):
+        for j in range(i + 1, len(nucleotides)):
+            if cluster_labels[i] != cluster_labels[j] and distance_matrix[i][j] > max_distance:
+                max_distance = distance_matrix[i][j]
+                parents = (nucleotides[i], nucleotides[j])
+
+    return parents
+
+def breed_children(parent1, parent2):
+    # we randomly choose a gene from either parent
+
+    child = ''.join([random.choice([el1, el2]) for el1, el2 in zip(parent1, parent2)])
+    return child
+
+def graph_results(Z):
+    plt.figure(figsize=(10, 7))
+    dendrogram(Z)
+    plt.title('Dendrogram for Divisive Clustering')
+    plt.xlabel('Specimen Index')
+    plt.ylabel('Distance')
     plt.show()
 
 '''
@@ -55,23 +97,42 @@ EXECUTION
 
 def main():
 
-    specimens = 10
+    # preset data before iterating
+    specimens = 5
+    nucleotides = generate_nucleotide_sequences(specimens, 10)
+    max_variance = 0
+    max_iter = 10
 
-    # nucleotides = generate_nucleotide_sequences(specimens, 10)
-    # print('random nucleotides: ', nucleotides)   
-    # X = np.array([binary_conversion(seq) for seq in nucleotides])
-    # print('binary converted data: ', X)
+    for iter in range(max_iter):
 
-    '''
-    preset synthetic data for testing
-    '''
+        print('iteration:', iter + 1)
 
-    nucleotides = ['TCTTTGCTAA', 'CAGCTAACAG', 'GGTAGAGATT', 'TCTTTTTCCG', 'AGTACCAGGT', 'CCATCTCCAC', 'CAATTTGAAA', 'GAGTGCCCGA', 'CCTAAACCGC', 'GATGGAAATT']
-    X = np.array([binary_conversion(seq) for seq in nucleotides])
+        distance_matrix = custom_distance_matrix(nucleotides)
+        condensed_matrix = squareform(distance_matrix)
+        Z = linkage(condensed_matrix, method='complete')
+    
+        # need to come up with a way to predefine how many clusters there should be
+        cluster_labels = fcluster(Z, t=5, criterion='maxclust')
+        print('cluster labels:', cluster_labels)
 
-    # need to see if there's an empirical way to test max_clusters_number, otherwise just setting it equal to the highest value where the cluster class doesn't change
-    clustered_class = DePDDP(max_clusters_number=3).fit_predict(X)
-    print('clustered_class: ', clustered_class)
-    graph_results(clustered_class, X)
+        # if we do variance across clusters and then increase the number of clusters, the overall variance would decrease which is not ideal
+        # we are presetting the number of clusters though
+        variance = calculate_variance(cluster_labels, nucleotides)
+        print('simple variance:', variance)
+        print('max variance:', max_variance)
+
+        if variance > max_variance:
+            max_variance = variance
+        elif (max_variance - variance) < 0.01:
+            break
+
+        p1, p2 = find_parents(cluster_labels, nucleotides)
+        c1 = breed_children(p1, p2)
+        print('parents:', p1, p2)
+        print('child:', c1)
+        nucleotides.append(c1)
+
+    print('final nucleotides:', nucleotides)
+    graph_results(Z)
 
 main()
