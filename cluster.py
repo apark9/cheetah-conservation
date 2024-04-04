@@ -63,7 +63,7 @@ def calculate_variance(cluster_labels, nucleotides):
 
     return variance
 
-def find_parents(cluster_labels, nucleotides):
+def breed_children(cluster_labels, nucleotides):
     distance_matrix = custom_distance_matrix(nucleotides)
     max_distance = 0
     parents = None
@@ -74,14 +74,12 @@ def find_parents(cluster_labels, nucleotides):
             if cluster_labels[i] != cluster_labels[j] and distance_matrix[i][j] > max_distance:
                 max_distance = distance_matrix[i][j]
                 parents = (nucleotides[i], nucleotides[j])
+    
+    parent1, parent2 = parents
 
-    return parents
-
-def breed_children(parent1, parent2):
-    # we randomly choose a gene from either parent
-
-    child = ''.join([random.choice([el1, el2]) for el1, el2 in zip(parent1, parent2)])
-    return child
+    for _ in range(3):
+        child = ''.join([random.choice([el1, el2]) for el1, el2 in zip(parent1, parent2)])
+        nucleotides.append(child)
 
 def graph_results(Z):
     plt.figure(figsize=(10, 7))
@@ -95,13 +93,18 @@ def graph_results(Z):
 EXECUTION
 '''
 
+global nucleotides
+
 def main():
 
     # preset data before iterating
-    specimens = 5
-    nucleotides = generate_nucleotide_sequences(specimens, 10)
+    specimens = 20
+    nucleotides = generate_nucleotide_sequences(specimens, 100)
     max_variance = 0
-    max_iter = 10
+    max_iter = 5
+    label_hist = []
+    highest_var_iter = 0
+    early_stopping = False
 
     for iter in range(max_iter):
 
@@ -112,27 +115,33 @@ def main():
         Z = linkage(condensed_matrix, method='complete')
     
         # need to come up with a way to predefine how many clusters there should be
-        cluster_labels = fcluster(Z, t=5, criterion='maxclust')
-        print('cluster labels:', cluster_labels)
+        cluster_labels = fcluster(Z, t=20, criterion='maxclust')
+        label_hist.append(cluster_labels)
+
+        if iter == 0:
+            initial_variance = calculate_variance(cluster_labels, nucleotides)
 
         # if we do variance across clusters and then increase the number of clusters, the overall variance would decrease which is not ideal
         # we are presetting the number of clusters though
         variance = calculate_variance(cluster_labels, nucleotides)
-        print('simple variance:', variance)
-        print('max variance:', max_variance)
 
         if variance > max_variance:
             max_variance = variance
-        elif (max_variance - variance) < 0.01:
-            break
+            highest_var_iter = iter
+        elif (max_variance - variance) < 0.001:
+            # allow for two cases in which the max variance might not be reached
+            if early_stopping:
+                break
+            else:
+                early_stopping = True
 
-        p1, p2 = find_parents(cluster_labels, nucleotides)
-        c1 = breed_children(p1, p2)
-        print('parents:', p1, p2)
-        print('child:', c1)
-        nucleotides.append(c1)
+        breed_children(cluster_labels, nucleotides)
 
     print('final nucleotides:', nucleotides)
+    print('initial variance:', initial_variance)
+    print('highest variance:', max_variance)
+    print('highest variance iteration:', highest_var_iter + 1)
+    # print('final cluster labels:', label_hist[highest_var_iter])
     graph_results(Z)
 
 main()
