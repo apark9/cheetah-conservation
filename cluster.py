@@ -119,7 +119,7 @@ def graph_results(Z):
 EXECUTION
 '''
 
-def main():
+def clustering():
 
     # preset data before iterating
     metadata, alleles = generate_sequences('data_generation/specimens.txt')

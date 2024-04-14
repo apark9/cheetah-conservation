@@ -58,12 +58,18 @@ current_generation = first_generation
 
 
 for i in range(num_iterations):
-    part_1 = features(current_generation, genes_to_consider)
-    part_2 = clustering(part_1)
+    features(current_generation, genes_to_consider)
+    clustering() # modify prints so that the current_generation file is updated
+        # clusters
+        # pairs
+        # breeds
 
-    part_3 = pairing(part_2)
-    part_4_benchmark, part_4_project = benchmark(part_3)
-
+    part_4_benchmark, part_4_project = benchmark()
     benchmark_results.append(part_4_benchmark)
     project_results.append(part_4_project)
+
+
+# TO-DO:
+    # functions
+    # benchmark
 

@@ -196,7 +196,7 @@ for i in range(num_specimens):
   synthetic_specimens.append(new_specimen)
 
 # Save to a file
-with open(parent_directory + '/data/first_generation.txt', 'w') as file:
+with open(parent_directory + '/specimens/first_generation.txt', 'w') as file:
     for sublist in synthetic_specimens:
         file.write(' '.join(map(str, sublist)) + '\n')
 
