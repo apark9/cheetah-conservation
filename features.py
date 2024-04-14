@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 
 
+iter = 0
+
 genes_to_consider = 10
 
 
@@ -44,9 +46,11 @@ indexes_of_genes_to_consider = indexes_of_genes_to_consider.union(idx1).union(id
 final_data = data.iloc[:, indexes_of_genes_to_consider]
 print(final_data)
 
+final_data.to_csv("pandas_features_selected/"+str(iter)+".csv")
+
 indexes_of_genes_to_consider = indexes_of_genes_to_consider[2:]
 
-f = open("features.txt", "w")
+f = open("features_selected/"+str(iter)+".txt", "w")
 for index, row in final_data.iterrows():
     f.write('['+row[0]+','+row[1]+']')
     f.write('[')
