@@ -22,6 +22,10 @@ from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 from scipy.spatial.distance import squareform
 # from data_generation.data import synthetic_specimens
 
+'''
+NOTE TO SELF: NEED TO FIGURE OUT THE VARIANCE COMPONENT
+'''
+
 def generate_sequences(file_path):
 
     metadata, alleles = [], []
@@ -122,7 +126,7 @@ EXECUTION
 def clustering():
 
     # preset data before iterating
-    metadata, alleles = generate_sequences('data_generation/specimens.txt')
+    metadata, alleles = generate_sequences('data/features.txt')
     max_variance = 0
     max_iter = 5
     parent_metadata = [(_, _) for _ in range(max_iter)]
