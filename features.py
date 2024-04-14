@@ -43,3 +43,24 @@ indexes_of_genes_to_consider = indexes_of_genes_to_consider.union(idx1).union(id
 #print final data to consider for clustering :)
 final_data = data.iloc[:, indexes_of_genes_to_consider]
 print(final_data)
+
+indexes_of_genes_to_consider = indexes_of_genes_to_consider[2:]
+
+f = open("features.txt", "w")
+for index, row in final_data.iterrows():
+    f.write('['+row[0]+','+row[1]+']')
+    f.write('[')
+    firstRound = True
+    for i in range(len(indexes_of_genes_to_consider)):
+        if firstRound == False:
+            f.write(',')
+        f.write(row[indexes_of_genes_to_consider[i]])
+        firstRound = False
+    f.write(']')
+    f.write('\n')
+f.close()
+
+
+
+
+# ['F', 6] ['BB', 'BA', 'DC', 'BA', 'GE’]
