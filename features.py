@@ -52,13 +52,13 @@ indexes_of_genes_to_consider = indexes_of_genes_to_consider[2:]
 
 f = open("features_selected/"+str(iter)+".txt", "w")
 for index, row in final_data.iterrows():
-    f.write('['+row[0]+','+row[1]+']')
+    f.write('[\''+row[0]+'\','+row[1]+']')
     f.write('[')
     firstRound = True
     for i in range(len(indexes_of_genes_to_consider)):
         if firstRound == False:
             f.write(',')
-        f.write(row[indexes_of_genes_to_consider[i]])
+        f.write('\''+row[indexes_of_genes_to_consider[i]]+'\'')
         firstRound = False
     f.write(']')
     f.write('\n')
