@@ -2,16 +2,24 @@
 # STEP 0: VERIFY THE DATA EXISTS  #
 # THE FILES IN DATA_GENERATION    #
 # /////////////////////////////// # 
+import os
+
+from features import *
+from cluster import *
+from benchmark import *
+from pairing import *
 
 
-# STEPS
+# MAIN FILE STEPS
     # 0: make first-generation specimens
     # REPEAT 1-4 for i iterations, where 1 iteration = 2 years, aka 1 breeding cycle
     # 1: features.py
         # of the existing genes, which ones should we focus on improving?
         # genes to focus on = ones that have least amount of variance
+        # OUTPUT: list of specimens but only the genes that matter
     # 2: cluster.py
         # 
+        # OUTPUT: list of specimens but only the genes that matter
     # 3:
     # 4:
 
@@ -28,17 +36,34 @@
     # if age is >= 8, remove from breeding pool (too old)
 
 
-# VERSIONS TO TEST
-    # version 1: 5 alleles per gene
+# DIFFERENT VERSIONS TO TEST
+    # version 1: constant 5 alleles per gene
     # version 2: varying number of genes
+    # version 3: try to optimize the # of features (what is the best # of features to focus on for a given number of genes?)
 
 
-files = []
-recovered_array = []
-with open('cheetah-conservation/data_generation/specimens.txt', 'r') as file:
-    for line in file:
-        bases = [base for base in line.strip().split() if base.isalpha()]
-        recovered_array.append(bases)
+# FOR TESTING PURPOSES
+num_iterations = 5
+genes_to_consider = 10
 
-print(len(recovered_array))
-print(recovered_array[0])
+
+# FOR BENCHMARK PURPOSES
+benchmark_results = []
+project_results = []
+
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+first_generation = open(current_dir + '/data_generation/specimens.txt', 'r')
+current_generation = first_generation
+
+
+for i in range(num_iterations):
+    part_1 = features(current_generation, genes_to_consider)
+    part_2 = clustering(part_1)
+
+    part_3 = pairing(part_2)
+    part_4_benchmark, part_4_project = benchmark(part_3)
+
+    benchmark_results.append(part_4_benchmark)
+    project_results.append(part_4_project)
+
