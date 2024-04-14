@@ -14,6 +14,7 @@ HIGH-LEVEL NOTES
 # STEP 0: IMPORTS AND GLOBALS     #
 # /////////////////////////////// #
 import random
+import os
 
 gene_size = 150
 num_genes = 100
@@ -30,7 +31,10 @@ allele_distributions = []           # IMPORTANT FOR SARAH: WHICH DISTRIBUTIONS A
 
 
 # OPEN ALIGNMENT FILE
-with open("cheetah-conservation/data_generation/D2_Alignment.txt", "r") as file:
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_directory = os.path.dirname(current_dir)
+
+with open(current_dir + "/D2_Alignment.txt", "r") as file:
     lines = file.readlines()
 def extract_sequence(line):
     return line.split()[2]
@@ -192,7 +196,7 @@ for i in range(num_specimens):
   synthetic_specimens.append(new_specimen)
 
 # Save to a file
-with open('cheetah-conservation/data_generation/specimens.txt', 'w') as file:
+with open(parent_directory + '/data/first_generation.txt', 'w') as file:
     for sublist in synthetic_specimens:
         file.write(' '.join(map(str, sublist)) + '\n')
 
