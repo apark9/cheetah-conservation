@@ -22,6 +22,10 @@ from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 from scipy.spatial.distance import squareform
 # from data_generation.data import synthetic_specimens
 
+'''
+NOTE TO SELF: NEED TO FIGURE OUT THE VARIANCE COMPONENT
+'''
+
 def generate_sequences(file_path):
 
     metadata, alleles = [], []
