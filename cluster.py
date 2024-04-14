@@ -126,7 +126,7 @@ EXECUTION
 def main():
 
     # preset data before iterating
-    metadata, alleles = generate_sequences('data_generation/specimens.txt')
+    metadata, alleles = generate_sequences('data/features.txt')
     max_variance = 0
     max_iter = 5
     parent_metadata = [(_, _) for _ in range(max_iter)]
