@@ -96,7 +96,7 @@ def mutate_sequence(seq):
 for i in range(len(genes)):
   single_gene_alleles = []
   j = 0
-  number_alleles = random.randint(2, 10) # CAN CHANGE
+  number_alleles = 5 # random.randint(2, 10) # CAN CHANGE: FOR FIRST ROUND, LET US JUST SET TO 5 ALLELES PER GENE
   while j < number_alleles:
     new_seq = mutate_sequence(genes[i])
     if new_seq not in single_gene_alleles:
