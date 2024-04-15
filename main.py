@@ -42,7 +42,7 @@ from benchmark import *
 
 
 # FOR TESTING PURPOSES
-num_iterations = 10
+num_iterations = 3
 genes_to_consider = 10
 
 

@@ -105,6 +105,8 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
                 parent1 = alleles[i]
                 parent2 = alleles[j]
 
+                print(len(parent1), len(parent2))
+
                 for _ in range(3):
                     child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
                     metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
