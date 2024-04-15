@@ -7,7 +7,6 @@ import os
 from features import *
 from cluster import *
 from benchmark import *
-from pairing import *
 
 
 # MAIN FILE STEPS
@@ -43,7 +42,7 @@ from pairing import *
 
 
 # FOR TESTING PURPOSES
-num_iterations = 5
+num_iterations = 1
 genes_to_consider = 10
 
 
@@ -52,24 +51,27 @@ benchmark_results = []
 project_results = []
 
 
+# set current generation to first generation
+print("Creating First Generation")
 current_dir = os.path.dirname(os.path.abspath(__file__))
-first_generation = open(current_dir + '/data_generation/specimens.txt', 'r')
-current_generation = first_generation
+with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, open(current_dir + '/specimens/current_generation.txt', 'w') as destination_file:
+    for line in source_file:
+        destination_file.write(line)
 
 
 for i in range(num_iterations):
-    features(current_generation, genes_to_consider)
-    clustering() # modify prints so that the current_generation file is updated
+    features(current_dir + '/specimens/current_generation.txt', genes_to_consider)
+    clustering(current_dir + '/features_selected/0.txt') 
         # clusters
         # pairs
         # breeds
 
-    part_4_benchmark, part_4_project = benchmark()
-    benchmark_results.append(part_4_benchmark)
-    project_results.append(part_4_project)
+    #part_4_benchmark, part_4_project = benchmark()
+    #benchmark_results.append(part_4_benchmark)
+    #project_results.append(part_4_project)
 
 
 # TO-DO:
-    # functions
+    # functions (done)
     # benchmark
 

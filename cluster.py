@@ -35,7 +35,7 @@ def generate_sequences(file_path):
 
     for datapoint in data:
         # Assuming the datapoint is a string like "['F', 6] ['BB', 'AB', 'CD']"
-        parts = datapoint.split('] [')
+        parts = datapoint.split('][')
         metadata_str = parts[0] + ']'
         alleles_str = '[' + parts[1]
 
@@ -44,8 +44,8 @@ def generate_sequences(file_path):
         alleles.append(ast.literal_eval(alleles_str))
                        
     # to remove later
-    print("metadata:", metadata)
-    print("alleles:", alleles)
+    # print("metadata:", metadata)
+    # print("alleles:", alleles)
 
     return metadata, alleles
     
@@ -108,8 +108,10 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
 
     for _ in range(3):
         child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
-        metadata.append([random.choice(['F', 'M']), 0])
+        metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
         alleles.append(child)
+
+
 
 def graph_results(Z):
     plt.figure(figsize=(10, 7))
@@ -123,10 +125,11 @@ def graph_results(Z):
 EXECUTION
 '''
 
-def clustering():
+def clustering(features):
+    print("Clustering")
 
     # preset data before iterating
-    metadata, alleles = generate_sequences('data/features.txt')
+    metadata, alleles = generate_sequences(features)
     max_variance = 0
     max_iter = 5
     parent_metadata = [(_, _) for _ in range(max_iter)]
@@ -139,7 +142,7 @@ def clustering():
 
     for iter in range(max_iter):
 
-        print('iteration:', iter + 1)
+        # print('iteration:', iter + 1)
 
         distance_matrix = custom_distance_matrix(alleles)
         condensed_matrix = squareform(distance_matrix)
@@ -166,12 +169,10 @@ def clustering():
         update_age(metadata, alleles)
         breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter)
         
-    print('initial variance:', initial_variance)
-    print('highest variance:', max_variance)
-    print('highest variance iteration:', highest_var_iter + 1)
-    print('final cluster labels:', label_hist[highest_var_iter])
-    print('final metadata:', metadata)
-    print('final alleles:', alleles)
-    graph_results(Z)
-
-main()
+    #print('initial variance:', initial_variance)
+    #print('highest variance:', max_variance)
+    #print('highest variance iteration:', highest_var_iter + 1)
+    #print('final cluster labels:', label_hist[highest_var_iter])
+    #print('final metadata:', metadata)
+    #print('final alleles:', alleles)
+    #graph_results(Z)
