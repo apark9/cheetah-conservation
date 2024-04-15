@@ -97,8 +97,8 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
     # max_distance = 0
 
     # Compare sequences from different clusters to find the maximum distance
-    for i in range(len(alleles)):
-        for j in range(i + 1, len(alleles)):
+    for i in range(len(cluster_labels)):
+        for j in range(i + 1, len(cluster_labels)):
             # different groups, max distance, different gender
             if cluster_labels[i] != cluster_labels[j] and metadata[i][0] != metadata[j][0]:
                 # max_distance = distance_matrix[i][j]
