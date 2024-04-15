@@ -42,7 +42,7 @@ from benchmark import *
 
 
 # FOR TESTING PURPOSES
-num_iterations = 1
+num_iterations = 10
 genes_to_consider = 10
 
 
@@ -61,7 +61,7 @@ with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, 
 
 for i in range(num_iterations):
     features(current_dir + '/specimens/current_generation.txt', genes_to_consider)
-    clustering(current_dir + '/features_selected/0.txt') 
+    clustering(current_dir + '/features_selected/0.txt', current_dir + '/specimens/current_generation.txt') 
         # clusters
         # pairs
         # breeds

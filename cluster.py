@@ -35,7 +35,7 @@ def generate_sequences(file_path):
 
     for datapoint in data:
         # Assuming the datapoint is a string like "['F', 6] ['BB', 'AB', 'CD']"
-        parts = datapoint.split('][')
+        parts = datapoint.split('] [')
         metadata_str = parts[0] + ']'
         alleles_str = '[' + parts[1]
 
@@ -77,8 +77,11 @@ def calculate_variance(cluster_labels, alleles):
 
 def update_age(metadata, alleles):
     for i in reversed(range(len(metadata))):
-        metadata[i][1] += 1
-        if metadata[i] == ['F', 8] or metadata[i] == ['M', 10]:
+        metadata[i][1] += 2
+        if metadata[i][0] == "F" and metadata[i][1] > 10:
+            metadata.pop(i)
+            alleles.pop(i)
+        elif metadata[i][0] == "M" and metadata[i][1] > 10:
             metadata.pop(i)
             alleles.pop(i)
 
@@ -110,6 +113,8 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
         child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
         metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
         alleles.append(child)
+    
+    return metadata, alleles
 
 
 
@@ -125,11 +130,13 @@ def graph_results(Z):
 EXECUTION
 '''
 
-def clustering(features):
+def clustering(features, current_generation):
     print("Clustering")
 
     # preset data before iterating
     metadata, alleles = generate_sequences(features)
+    general_metadata, general_alleles = generate_sequences(current_generation)
+
     max_variance = 0
     max_iter = 5
     parent_metadata = [(_, _) for _ in range(max_iter)]
@@ -138,37 +145,46 @@ def clustering(features):
     highest_var_iter = 0
     early_stopping = False
     # number of specimens + children - deaths
-    exp_specimens = 25 + 3 * max_iter - 1 * max_iter
+    exp_specimens = 50 + 3 * max_iter - 1 * max_iter
 
-    for iter in range(max_iter):
+    
+    iter = 0
+    # print('iteration:', iter + 1)
 
-        # print('iteration:', iter + 1)
+    distance_matrix = custom_distance_matrix(alleles)
+    condensed_matrix = squareform(distance_matrix)
+    Z = linkage(condensed_matrix, method='complete')
 
-        distance_matrix = custom_distance_matrix(alleles)
-        condensed_matrix = squareform(distance_matrix)
-        Z = linkage(condensed_matrix, method='complete')
+    cluster_labels = fcluster(Z, t=exp_specimens, criterion='maxclust')
+    label_hist.append(cluster_labels)
 
-        cluster_labels = fcluster(Z, t=exp_specimens, criterion='maxclust')
-        label_hist.append(cluster_labels)
+    if iter == 0:
+        initial_variance = calculate_variance(cluster_labels, alleles)
 
-        if iter == 0:
-            initial_variance = calculate_variance(cluster_labels, alleles)
+    variance = calculate_variance(cluster_labels, alleles)
 
-        variance = calculate_variance(cluster_labels, alleles)
+    if variance > max_variance:
+        max_variance = variance
+        highest_var_iter = iter
+    elif (max_variance - variance) < 0.001:
+        # allow for two cases in which the max variance might not be reached
+        if early_stopping:
+            print("stop?")
+        else:
+            early_stopping = True
 
-        if variance > max_variance:
-            max_variance = variance
-            highest_var_iter = iter
-        elif (max_variance - variance) < 0.001:
-            # allow for two cases in which the max variance might not be reached
-            if early_stopping:
-                break
-            else:
-                early_stopping = True
+    update_age(general_metadata, general_alleles)
+    result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
+    
+    # Save to a file
+    synthetic_specimens = [[e1, e2] for e1, e2 in zip(result1, result2)]
+    
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(current_dir + '/specimens/current_generation.txt', 'w') as file:
+        for sublist in synthetic_specimens:
+            file.write(' '.join(map(str, sublist)) + '\n')
 
-        update_age(metadata, alleles)
-        breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter)
-        
     #print('initial variance:', initial_variance)
     #print('highest variance:', max_variance)
     #print('highest variance iteration:', highest_var_iter + 1)

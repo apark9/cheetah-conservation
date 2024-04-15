@@ -37,7 +37,6 @@ def features(current_generation_filepath, genes_to_consider):
     idx2 = pd.Index([1])
     indexes_of_genes_to_consider = indexes_of_genes_to_consider.union(idx1).union(idx2)
 
-
     #print final data to consider for clustering :)
     final_data = data.iloc[:, indexes_of_genes_to_consider]
     #print(final_data)
@@ -48,19 +47,19 @@ def features(current_generation_filepath, genes_to_consider):
 
     f = open("features_selected/"+str(iter)+".txt", "w")
     for index, row in final_data.iterrows():
-        f.write('[\''+row[0]+'\','+row[1]+']')
+        f.write('[\''+row[0]+'\', '+row[1]+'] ')
         f.write('[')
         firstRound = True
         for i in range(len(indexes_of_genes_to_consider)):
             if firstRound == False:
-                f.write(',')
+                f.write(', ')
             f.write('\''+row[indexes_of_genes_to_consider[i]]+'\'')
             firstRound = False
         f.write(']')
         f.write('\n')
     f.close()
 
-
+    print(list(indexes_of_genes_to_consider))
 
 
     # ['F', 6] ['BB', 'BA', 'DC', 'BA', 'GE’]
