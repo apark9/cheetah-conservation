@@ -78,10 +78,10 @@ def calculate_variance(cluster_labels, alleles):
 def update_age(metadata, alleles):
     for i in reversed(range(len(metadata))):
         metadata[i][1] += 2
-        if metadata[i][0] == "F" and metadata[i][1] > 10:
+        if metadata[i][0] == "F" and metadata[i][1] >= 10:
             metadata.pop(i)
             alleles.pop(i)
-        elif metadata[i][0] == "M" and metadata[i][1] > 10:
+        elif metadata[i][0] == "M" and metadata[i][1] >= 10:
             metadata.pop(i)
             alleles.pop(i)
 
@@ -97,8 +97,8 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
     # max_distance = 0
 
     # Compare sequences from different clusters to find the maximum distance
-    for i in range(len(alleles)):
-        for j in range(i + 1, len(alleles)):
+    for i in range(len(cluster_labels)):
+        for j in range(i + 1, len(cluster_labels)):
             # different groups, max distance, different gender
             if cluster_labels[i] != cluster_labels[j] and metadata[i][0] != metadata[j][0]:
                 # max_distance = distance_matrix[i][j]
@@ -111,6 +111,7 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
                     alleles.append(child)
     
     return metadata, alleles
+
 
 
 
