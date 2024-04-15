@@ -93,26 +93,22 @@ def punnett_square(allele1, allele2):
     return square
 
 def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter):
-    distance_matrix = custom_distance_matrix(alleles)
-    max_distance = 0
-    parents = None
+    # distance_matrix = custom_distance_matrix(alleles)
+    # max_distance = 0
 
     # Compare sequences from different clusters to find the maximum distance
     for i in range(len(alleles)):
         for j in range(i + 1, len(alleles)):
             # different groups, max distance, different gender
-            if cluster_labels[i] != cluster_labels[j] and distance_matrix[i][j] > max_distance and metadata[i][0] != metadata[j][0]:
-                max_distance = distance_matrix[i][j]
-                parents = alleles[i], alleles[j]
-                parent_metadata[iter] = metadata[i], metadata[j]
-                parent_alleles[iter] = alleles[i], alleles[j]
-    
-    parent1, parent2 = parents
+            if cluster_labels[i] != cluster_labels[j] and metadata[i][0] != metadata[j][0]:
+                # max_distance = distance_matrix[i][j]
+                parent1 = alleles[i]
+                parent2 = alleles[j]
 
-    for _ in range(3):
-        child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
-        metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
-        alleles.append(child)
+                for _ in range(3):
+                    child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
+                    metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
+                    alleles.append(child)
     
     return metadata, alleles
 
