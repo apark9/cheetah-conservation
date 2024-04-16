@@ -93,23 +93,30 @@ def punnett_square(allele1, allele2):
     return square
 
 def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter):
-    # distance_matrix = custom_distance_matrix(alleles)
-    # max_distance = 0
+    distance_matrix = custom_distance_matrix(alleles)
+    max_distance = 0
 
+    kids_metadata = []
+    kids_alleles = []
+    
     # Compare sequences from different clusters to find the maximum distance
-    for i in range(len(cluster_labels)):
-        for j in range(i + 1, len(cluster_labels)):
+    for i in range(len(alleles) - 1):
+        for j in range(i + 1, len(alleles) - 2):
             # different groups, max distance, different gender
-            if cluster_labels[i] != cluster_labels[j] and metadata[i][0] != metadata[j][0]:
-                # max_distance = distance_matrix[i][j]
+            if cluster_labels[i] != cluster_labels[j] and distance_matrix[i][j] > max_distance and metadata[i][0] != metadata[j][0]:
+                max_distance = distance_matrix[i][j]
                 parent1 = alleles[i]
                 parent2 = alleles[j]
 
                 for _ in range(3):
                     child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
-                    metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
-                    alleles.append(child)
-    
+                    kids_metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
+                    kids_alleles.append(child)
+
+    metadata += kids_metadata
+    alleles += kids_alleles
+
+    print("number of kids:", len(kids_metadata))
     return metadata, alleles
 
 
@@ -180,11 +187,3 @@ def clustering(features, current_generation):
     with open(current_dir + '/specimens/current_generation.txt', 'w') as file:
         for sublist in synthetic_specimens:
             file.write(' '.join(map(str, sublist)) + '\n')
-
-    #print('initial variance:', initial_variance)
-    #print('highest variance:', max_variance)
-    #print('highest variance iteration:', highest_var_iter + 1)
-    #print('final cluster labels:', label_hist[highest_var_iter])
-    #print('final metadata:', metadata)
-    #print('final alleles:', alleles)
-    #graph_results(Z)
