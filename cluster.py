@@ -78,10 +78,10 @@ def calculate_variance(cluster_labels, alleles):
 def update_age(metadata, alleles):
     for i in reversed(range(len(metadata))):
         metadata[i][1] += 2
-        if metadata[i][0] == "F" and metadata[i][1] > 10:
+        if metadata[i][0] == "F" and metadata[i][1] >= 10:
             metadata.pop(i)
             alleles.pop(i)
-        elif metadata[i][0] == "M" and metadata[i][1] > 10:
+        elif metadata[i][0] == "M" and metadata[i][1] >= 10:
             metadata.pop(i)
             alleles.pop(i)
 
@@ -115,9 +115,9 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
 
     metadata += kids_metadata
     alleles += kids_alleles
-
-    print("number of kids:", len(kids_metadata))
+    
     return metadata, alleles
+
 
 
 
