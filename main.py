@@ -57,19 +57,25 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, open(current_dir + '/specimens/current_generation.txt', 'w') as destination_file:
     for line in source_file:
         destination_file.write(line)
+with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, open(current_dir + '/specimens/random_generation.txt', 'w') as destination_file:
+    for line in source_file:
+        destination_file.write(line)
 
 
 for i in range(num_iterations):
     features(current_dir + '/specimens/current_generation.txt', genes_to_consider)
     clustering(current_dir + '/features_selected/0.txt', current_dir + '/specimens/current_generation.txt') 
+
         # clusters
         # pairs
         # breeds
 
-    #part_4_benchmark, part_4_project = benchmark()
-    #benchmark_results.append(part_4_benchmark)
-    #project_results.append(part_4_project)
+    part_4_benchmark, part_4_project = benchmark(current_dir + '/specimens/random_generation.txt', current_dir + '/specimens/current_generation.txt')
+    benchmark_results.append(part_4_benchmark)
+    project_results.append(part_4_project)
 
+#print("Benchmark:", benchmark_results, "\n")
+#print("Project:", project_results, "\n")
 
 # TO-DO:
     # functions (done)

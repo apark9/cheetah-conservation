@@ -115,7 +115,6 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
 
     metadata += kids_metadata
     alleles += kids_alleles
-    
     return metadata, alleles
 
 
