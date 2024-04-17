@@ -22,10 +22,6 @@ from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 from scipy.spatial.distance import squareform
 # from data_generation.data import synthetic_specimens
 
-'''
-NOTE TO SELF: NEED TO FIGURE OUT THE VARIANCE COMPONENT
-'''
-
 def generate_sequences(file_path):
 
     metadata, alleles = [], []
@@ -108,7 +104,7 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
                 parent1 = alleles[i]
                 parent2 = alleles[j]
 
-                for _ in range(3):
+                for _ in range(4):
                     child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
                     kids_metadata.append([random.choice(['F', 'M']), 2]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
                     kids_alleles.append(child)
@@ -118,8 +114,50 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
     
     return metadata, alleles
 
+def breed_children_multiple_dads(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter):
+    distance_matrix = custom_distance_matrix(alleles)
+    max_distance = 0
 
+    kids_metadata = []
+    kids_alleles = []
+    
+    max_fathers = 2
+    female_count = 0
 
+    # Compare sequences from different clusters to find the maximum distance
+    for i in range(len(alleles) - 1):
+        if metadata[i][0] == 'F' and female_count < 5:
+            # keep track of all distances from the female to all the males and select best 2 at end
+            max_distances = []
+
+            for j in range(i + 1, len(alleles) - 2):
+                if cluster_labels[i] != cluster_labels[j] and metadata[j][0] == 'M':
+                    if distance_matrix[i][j] > max_distance:
+                        max_distances.append((distance_matrix[i][j], i, j))
+                    else:
+                        continue
+            
+            # sort the distances and select the best 2
+            max_distances.sort(key=lambda x: x[0], reverse=True)
+            max_distances = max_distances[:max_fathers]
+            print("max distances: ", max_distances)
+
+            mother = alleles[i]
+            for _, i, j in max_distances:
+                father = alleles[j]
+                for _ in range(2):
+                    child = [random.choice(punnett_square(mother, father)) for mother, father in zip(mother, father)]
+                    kids_metadata.append([random.choice(['F', 'M']), 2])
+                    kids_alleles.append(child)
+
+            female_count += 1
+
+    print("number of kids: ", len(kids_metadata))
+    metadata += kids_metadata
+    alleles += kids_alleles
+    print("number of individuals: ", len(alleles))
+    
+    return metadata, alleles
 
 def graph_results(Z):
     plt.figure(figsize=(10, 7))
@@ -178,7 +216,7 @@ def clustering(features, current_generation):
 
     update_age(general_metadata, general_alleles)
     result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
-    
+    # result1, result2 = breed_children_multiple_dads(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
     # Save to a file
     synthetic_specimens = [[e1, e2] for e1, e2 in zip(result1, result2)]
     
