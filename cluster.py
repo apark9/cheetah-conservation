@@ -112,7 +112,7 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
     metadata += kids_metadata
     alleles += kids_alleles
     
-    return metadata, alleles
+    return kids_metadata, kids_alleles, metadata, alleles
 
 def breed_children_multiple_dads(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter):
     distance_matrix = custom_distance_matrix(alleles)
@@ -140,7 +140,7 @@ def breed_children_multiple_dads(cluster_labels, metadata, alleles, parent_metad
             # sort the distances and select the best 2
             max_distances.sort(key=lambda x: x[0], reverse=True)
             max_distances = max_distances[:max_fathers]
-            print("max distances: ", max_distances)
+            #print("max distances: ", max_distances)
 
             mother = alleles[i]
             for _, i, j in max_distances:
@@ -152,10 +152,10 @@ def breed_children_multiple_dads(cluster_labels, metadata, alleles, parent_metad
 
             female_count += 1
 
-    print("number of kids: ", len(kids_metadata))
+    #print("number of kids: ", len(kids_metadata))
     metadata += kids_metadata
     alleles += kids_alleles
-    print("number of individuals: ", len(alleles))
+    #print("number of individuals: ", len(alleles))
     
     return metadata, alleles
 
@@ -215,7 +215,7 @@ def clustering(features, current_generation):
             early_stopping = True
 
     update_age(general_metadata, general_alleles)
-    result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
+    kids_1, kids_2, result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
     # result1, result2 = breed_children_multiple_dads(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
     # Save to a file
     synthetic_specimens = [[e1, e2] for e1, e2 in zip(result1, result2)]
@@ -225,3 +225,5 @@ def clustering(features, current_generation):
     with open(current_dir + '/specimens/current_generation.txt', 'w') as file:
         for sublist in synthetic_specimens:
             file.write(' '.join(map(str, sublist)) + '\n')
+
+    return kids_1, kids_2

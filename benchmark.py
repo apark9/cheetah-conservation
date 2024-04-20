@@ -1,4 +1,3 @@
-
 # /////////// #
 # BENCHMARK   # 
 # /////////// #
@@ -24,13 +23,13 @@ def generate_sequences(file_path):
     return metadata, alleles
 
 
-
 def pair_random(shorter, larger, random_pairings):
     for specimen in shorter:
         other_specimen = random.choice(larger)
         larger.remove(other_specimen)
-        random_pairings.append([specimen, other_specimen])
+        random_pairings.append([specimen, other_specimen])    
     return random_pairings
+
 
 def punnett_square(allele1, allele2):
     square = []
@@ -40,7 +39,7 @@ def punnett_square(allele1, allele2):
     return square
 
 
-def breed_children(pairings, alleles, metadata):
+def breed_children(pairings, alleles, metadata, num_kids):
     kids_metadata = []
     kids_alleles = []
     for pair in pairings:
@@ -50,13 +49,16 @@ def breed_children(pairings, alleles, metadata):
             child = [random.choice(punnett_square(el1, el2)) for el1, el2 in zip(parent1, parent2)]
             kids_metadata.append([random.choice(['F', 'M']), 0]) # we're updating it to 2 because in the next iteration/2 years they will be of breeding age
             kids_alleles.append(child)
+    
+    kids_metadata = kids_metadata[:num_kids]
+    kids_alleles = kids_alleles[:num_kids]
+
     metadata += kids_metadata
     alleles += kids_alleles
-    return metadata, alleles
+    return kids_metadata, kids_alleles, metadata, alleles
 
 
-def random_generation(file_path):
-
+def random_generation(file_path, num_kids):
     # RANDOM BENCHMARK
     # get indices of the specimens from the metadata
     metadata, alleles = generate_sequences(file_path)
@@ -72,7 +74,7 @@ def random_generation(file_path):
     shorter = females if len(females) < len(males) else males
     larger = females if len(females) >= len(males) else males
     pairings = pair_random(shorter, larger, [])
-    metadata, alleles = breed_children(pairings, alleles, metadata)
+    _, kids_2, metadata, alleles = breed_children(pairings, alleles, metadata, num_kids)
     update_age(metadata, alleles)
 
     # Save to a file
@@ -81,26 +83,22 @@ def random_generation(file_path):
     with open(current_dir + '/specimens/random_generation.txt', 'w') as file:
         for sublist in synthetic_specimens:
             file.write(' '.join(map(str, sublist)) + '\n')
-    return alleles
+    return kids_2 # we only want the alleles of the kids
 
 
 def compute_variance(alleles):
     variances = []
     num_entries = len(alleles[0])
 
-    
-    
     for i in range(num_entries - 1):
         one_allele_all_specimens = []
         for j in range(len(alleles) - 1):   
             one_allele_all_specimens.append(alleles[j][i])
         
-        # now
         vocabulary = set(one_allele_all_specimens)
         counts = Counter(one_allele_all_specimens)
-
         frequencies = [round(counts[value] / len(one_allele_all_specimens), 2) for value in vocabulary]
-        bottleneck_frequency = max(frequencies)
+        bottleneck_frequency = sum(frequencies) / len(frequencies)
         variances.append(bottleneck_frequency)
     
     return variances
@@ -108,16 +106,14 @@ def compute_variance(alleles):
 
 
 
-def benchmark(file_path_random, file_path_current):
+def benchmark(file_path_random, num_kids, kids_alleles):
     print("Benchmark")
 
     # get the benchmark = random plus the current generation
-    random_alleles = random_generation(file_path_random)
-    _, current_alleles = generate_sequences(file_path_current)
-
+    random_kids_alleles = random_generation(file_path_random, num_kids)
     # compute variance of random and current
-    variance_random = compute_variance(random_alleles)
-    variance_current = compute_variance(current_alleles)
+    variance_random = compute_variance(random_kids_alleles)
+    variance_current = compute_variance(kids_alleles)
     return variance_random, variance_current
 
     

@@ -7,6 +7,7 @@ import os
 from features import *
 from cluster import *
 from benchmark import *
+from graphs import *
 
 
 # MAIN FILE STEPS
@@ -42,8 +43,8 @@ from benchmark import *
 
 
 # FOR TESTING PURPOSES
-num_iterations = 3
-genes_to_consider = 10
+num_iterations = 10
+genes_to_consider = 20
 
 
 # FOR BENCHMARK PURPOSES
@@ -61,21 +62,15 @@ with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, 
     for line in source_file:
         destination_file.write(line)
 
-
 for i in range(num_iterations):
     features(current_dir + '/specimens/current_generation.txt', genes_to_consider)
-    clustering(current_dir + '/features_selected/0.txt', current_dir + '/specimens/current_generation.txt') 
-
-        # clusters
-        # pairs
-        # breeds
-
-    part_4_benchmark, part_4_project = benchmark(current_dir + '/specimens/random_generation.txt', current_dir + '/specimens/current_generation.txt')
+    kids_1, kids_2 = clustering(current_dir + '/features_selected/0.txt', current_dir + '/specimens/current_generation.txt') 
+    part_4_benchmark, part_4_project = benchmark(current_dir + '/specimens/random_generation.txt', len(kids_1), kids_2)
     benchmark_results.append(part_4_benchmark)
     project_results.append(part_4_project)
 
-#print("Benchmark:", benchmark_results, "\n")
-#print("Project:", project_results, "\n")
+graph_benchmark(benchmark_results, project_results, num_iterations)
+
 
 # TO-DO:
     # functions (done)
