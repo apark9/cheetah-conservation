@@ -55,7 +55,9 @@ def breed_children(pairings, alleles, metadata, num_kids):
 
     metadata += kids_metadata
     alleles += kids_alleles
-    return kids_metadata, kids_alleles, metadata, alleles
+
+    update_age(metadata, alleles)
+    return metadata, alleles, kids_alleles
 
 
 def random_generation(file_path, num_kids):
@@ -74,16 +76,15 @@ def random_generation(file_path, num_kids):
     shorter = females if len(females) < len(males) else males
     larger = females if len(females) >= len(males) else males
     pairings = pair_random(shorter, larger, [])
-    _, kids_2, metadata, alleles = breed_children(pairings, alleles, metadata, num_kids)
-    update_age(metadata, alleles)
-
+    metadata, alleles, kids_alleles = breed_children(pairings, alleles, metadata, num_kids)
+    
     # Save to a file
     synthetic_specimens = [[e1, e2] for e1, e2 in zip(metadata, alleles)]
     current_dir = os.path.dirname(os.path.abspath(__file__))
     with open(current_dir + '/specimens/random_generation.txt', 'w') as file:
         for sublist in synthetic_specimens:
             file.write(' '.join(map(str, sublist)) + '\n')
-    return kids_2 # we only want the alleles of the kids
+    return kids_alleles
 
 
 def compute_variance(alleles):
@@ -100,20 +101,21 @@ def compute_variance(alleles):
         frequencies = [round(counts[value] / len(one_allele_all_specimens), 2) for value in vocabulary]
         bottleneck_frequency = sum(frequencies) / len(frequencies)
         variances.append(bottleneck_frequency)
-    
-    return variances
+        val = len(vocabulary)
+
+    return variances, val
             
 
 
 
-def benchmark(file_path_random, num_kids, kids_alleles):
+def benchmark(file_path_random, num_kids, kids_project):
     print("Benchmark")
 
     # get the benchmark = random plus the current generation
-    random_kids_alleles = random_generation(file_path_random, num_kids)
+    kids_benchmark = random_generation(file_path_random, num_kids)
     # compute variance of random and current
-    variance_random = compute_variance(random_kids_alleles)
-    variance_current = compute_variance(kids_alleles)
-    return variance_random, variance_current
-
-    
+    print(len(kids_benchmark))
+    print(len(kids_benchmark))
+    variance_random, number_random = compute_variance(kids_benchmark)
+    variance_current, number_current = compute_variance(kids_project)
+    return variance_random, variance_current, number_random, number_current

@@ -44,12 +44,15 @@ from graphs import *
 
 # FOR TESTING PURPOSES
 num_iterations = 10
-genes_to_consider = 20
+genes_to_consider = 25
 
 
 # FOR BENCHMARK PURPOSES
 benchmark_results = []
 project_results = []
+
+benchmark_number = []
+project_number = []
 
 
 # set current generation to first generation
@@ -62,14 +65,24 @@ with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, 
     for line in source_file:
         destination_file.write(line)
 
+
+_, first_generation_alleles = generate_sequences(current_dir + '/specimens/current_generation.txt')
+first_generation_variance, _ = compute_variance(first_generation_alleles)
+benchmark_results.append(first_generation_variance)
+project_results.append(first_generation_variance)
+
 for i in range(num_iterations):
     features(current_dir + '/specimens/current_generation.txt', genes_to_consider)
-    kids_1, kids_2 = clustering(current_dir + '/features_selected/0.txt', current_dir + '/specimens/current_generation.txt') 
-    part_4_benchmark, part_4_project = benchmark(current_dir + '/specimens/random_generation.txt', len(kids_1), kids_2)
+    kids1, kids2 = clustering(current_dir + '/features_selected/0.txt', current_dir + '/specimens/current_generation.txt') 
+    part_4_benchmark, part_4_project, number_benchmark, number_project = benchmark(current_dir + '/specimens/random_generation.txt', len(kids1), kids2)
     benchmark_results.append(part_4_benchmark)
     project_results.append(part_4_project)
+    benchmark_number.append([number_benchmark])
+    project_number.append([number_project])
 
-graph_benchmark(benchmark_results, project_results, num_iterations)
+
+graph_benchmark(benchmark_results, project_results, num_iterations + 1)
+#graph_benchmark(benchmark_number, project_number, num_iterations)
 
 
 # TO-DO:
