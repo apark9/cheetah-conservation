@@ -30,7 +30,7 @@ def graph_benchmark(benchmark, project, num_iterations):
 """
 
 def graph_benchmark(project1, project2, num_iterations):
-    num_genes = 10
+    num_genes = 20
     ind = np.arange(num_genes)
     width = 0.1  # Adjust width for better spacing between subplots
     color_list = generate_color_list(num_iterations)
@@ -48,8 +48,8 @@ def graph_benchmark(project1, project2, num_iterations):
         bars1.append(axs[0].bar(ind + width * i, project1_num_genes[i], width, color=color_list[i]))
 
     axs[0].set_xlabel("Genes")
-    axs[0].set_ylabel('Average Frequency')
-    axs[0].set_title("Benchmark Frequencies")
+    axs[0].set_ylabel('Average Variance')
+    axs[0].set_title("Benchmark Variances")
 
     # Plotting bars for project2 in the second subplot
     bars2 = []
@@ -57,8 +57,8 @@ def graph_benchmark(project1, project2, num_iterations):
         bars2.append(axs[1].bar(ind + width * i, project2_num_genes[i], width, color=color_list[i]))
 
     axs[1].set_xlabel("Genes")
-    axs[1].set_ylabel('Average Frequency')
-    axs[1].set_title("Project Frequencies")
+    axs[1].set_ylabel('Average Variance')
+    axs[1].set_title("Project Variances")
 
     max_y_value = np.maximum(np.max(project1_num_genes), np.max(project2_num_genes))
 

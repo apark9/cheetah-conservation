@@ -4,6 +4,7 @@
 import os
 import ast
 import random
+import statistics
 from collections import Counter
 from cluster import *
 
@@ -88,6 +89,9 @@ def random_generation(file_path, num_kids):
 
 
 def compute_variance(alleles):
+
+    
+
     variances = []
     num_entries = len(alleles[0])
 
@@ -98,9 +102,12 @@ def compute_variance(alleles):
         
         vocabulary = set(one_allele_all_specimens)
         counts = Counter(one_allele_all_specimens)
-        frequencies = [round(counts[value] / len(one_allele_all_specimens), 2) for value in vocabulary]
-        bottleneck_frequency = sum(frequencies) / len(frequencies)
-        variances.append(bottleneck_frequency)
+        variance = statistics.variance(list(counts.values()))
+
+        #frequencies = [round(counts[value] / len(one_allele_all_specimens), 2) for value in vocabulary]
+        #bottleneck_frequency = sum(frequencies) / len(frequencies)
+        
+        variances.append(variance)
         val = len(vocabulary)
 
     return variances, val

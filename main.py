@@ -44,7 +44,7 @@ from graphs import *
 
 # FOR TESTING PURPOSES
 num_iterations = 10
-genes_to_consider = 25
+genes_to_consider = 75
 
 
 # FOR BENCHMARK PURPOSES
@@ -68,8 +68,8 @@ with open(current_dir + '/specimens/first_generation.txt', 'r') as source_file, 
 
 _, first_generation_alleles = generate_sequences(current_dir + '/specimens/current_generation.txt')
 first_generation_variance, _ = compute_variance(first_generation_alleles)
-benchmark_results.append(first_generation_variance)
-project_results.append(first_generation_variance)
+#benchmark_results.append(first_generation_variance)
+#project_results.append(first_generation_variance)
 
 for i in range(num_iterations):
     features(current_dir + '/specimens/current_generation.txt', genes_to_consider)
@@ -81,7 +81,7 @@ for i in range(num_iterations):
     project_number.append([number_project])
 
 
-graph_benchmark(benchmark_results, project_results, num_iterations + 1)
+graph_benchmark(benchmark_results, project_results, num_iterations)
 #graph_benchmark(benchmark_number, project_number, num_iterations)
 
 

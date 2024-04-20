@@ -2,6 +2,16 @@
 # CLUSTER ALGORITHM  # 
 # ////////////////// #
 
+'''
+HIGH-LEVEL NOTES
+'''
+# 1. initial clustering: split dataset into two clusters
+# 2. select parents: two most dissimilar datapoints (could do this through scipy.spatial.distance)
+# 3. generate children: merge parents and create children
+# 4. add children: add children to dataset
+# 5. repeat: repeat steps 2-4 until stopping criterion is met
+# 6. stopping criterion: number of clusters is equal to the number of clusters specified
+
 # IMPORTS
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,29 +22,24 @@ from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 from scipy.spatial.distance import squareform
 # from data_generation.data import synthetic_specimens
 
+
+
 def generate_sequences(file_path):
-
     metadata, alleles = [], []
-
     with open(file_path, 'r') as file:
         data = file.read().splitlines()
-
     for datapoint in data:
         # Assuming the datapoint is a string like "['F', 6] ['BB', 'AB', 'CD']"
         parts = datapoint.split('] [')
         metadata_str = parts[0] + ']'
         alleles_str = '[' + parts[1]
-
         # Convert the string representations into Python lists
         metadata.append(ast.literal_eval(metadata_str))
         alleles.append(ast.literal_eval(alleles_str))
-                       
-    # to remove later
-    # print("metadata:", metadata)
-    # print("alleles:", alleles)
-
     return metadata, alleles
     
+
+
 def custom_distance_matrix(alleles):
     # takes in the alleles and calculates the total number of alleles that differ
     matrix_size = len(alleles)
@@ -44,8 +49,9 @@ def custom_distance_matrix(alleles):
             if i != j:
                 differences = sum(1 for a, b in zip(alleles[i], alleles[j]) if a != b)
                 distance_matrix[i][j] = differences
-
     return distance_matrix
+
+
 
 def parent_distance_matrix(metadata, alleles, cluster_labels):
     # compares each female to all males and returns the distance matrix
@@ -53,14 +59,14 @@ def parent_distance_matrix(metadata, alleles, cluster_labels):
     females = [i for i in range(matrix_size) if metadata[i][0] == 'F']
     males = [j for j in range(matrix_size) if metadata[j][0] == 'M']
     distance_matrix = np.zeros((len(females), len(males)))
-
     for fi, f in enumerate(females):
         for mi, m in enumerate(males):
             if cluster_labels[f] != cluster_labels[m]:
                 differences = sum(1 for a, b in zip(alleles[f], alleles[m]) if a != b)
                 distance_matrix[fi][mi] = differences
-    
     return distance_matrix
+
+
 
 def calculate_variance(cluster_labels, alleles):
     variance = 0
@@ -73,8 +79,9 @@ def calculate_variance(cluster_labels, alleles):
             new_distance_matrix = custom_distance_matrix(cluster)
             cluster_mean = np.mean(new_distance_matrix)
             variance += cluster_mean
-
     return variance
+
+
 
 def update_age(metadata, alleles):
     for i in reversed(range(len(metadata))):
@@ -86,6 +93,8 @@ def update_age(metadata, alleles):
             metadata.pop(i)
             alleles.pop(i)
 
+
+
 def punnett_square(allele1, allele2):
     square = []
     for allele1 in allele1:
@@ -93,10 +102,11 @@ def punnett_square(allele1, allele2):
             square.append(allele1 + allele2)
     return square
 
+
+
 def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_alleles, iter):
     distance_matrix = custom_distance_matrix(alleles)
     max_distance = 0
-
     kids_metadata = []
     kids_alleles = []
     
@@ -117,13 +127,12 @@ def breed_children(cluster_labels, metadata, alleles, parent_metadata, parent_al
     metadata += kids_metadata
     alleles += kids_alleles
     
-    return metadata, alleles
+    return kids_metadata, kids_alleles, metadata, alleles
+
 
 def breed_children_multiple_dads(cluster_labels, metadata, alleles, max_pairs=6, max_fathers=2, max_kids=2):
-
     distance_matrix = parent_distance_matrix(metadata, alleles, cluster_labels)
     results = []
-
     # top two males per female
     for fi, distances in enumerate(distance_matrix):
         if np.any(distances): 
@@ -164,8 +173,10 @@ def breed_children_multiple_dads(cluster_labels, metadata, alleles, max_pairs=6,
 
     metadata += kids_metadata
     alleles += kids_alleles
-    
-    return metadata, alleles
+
+    return kids_metadata, kids_alleles, metadata, alleles
+
+
 
 def graph_results(Z):
     plt.figure(figsize=(10, 7))
@@ -175,9 +186,13 @@ def graph_results(Z):
     plt.ylabel('Distance')
     plt.show()
 
+
+
 '''
 EXECUTION
 '''
+
+
 
 def clustering(features, current_generation):
     print("Clustering")
@@ -223,8 +238,8 @@ def clustering(features, current_generation):
             early_stopping = True
 
     update_age(general_metadata, general_alleles)
-    # result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
-    result1, result2 = breed_children_multiple_dads(cluster_labels, general_metadata, general_alleles)
+    kids_1, kids_2, result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
+    # result1, result2 = breed_children_multiple_dads(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
     # Save to a file
     synthetic_specimens = [[e1, e2] for e1, e2 in zip(result1, result2)]
     
@@ -233,3 +248,5 @@ def clustering(features, current_generation):
     with open(current_dir + '/specimens/current_generation.txt', 'w') as file:
         for sublist in synthetic_specimens:
             file.write(' '.join(map(str, sublist)) + '\n')
+
+    return kids_1, kids_2
