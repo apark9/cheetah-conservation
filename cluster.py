@@ -238,7 +238,7 @@ def clustering(features, current_generation):
             early_stopping = True
 
     update_age(general_metadata, general_alleles)
-    kids_1, kids_2, result1, result2 = breed_children(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
+    kids_1, kids_2, result1, result2 = breed_children_multiple_dads(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
     # result1, result2 = breed_children_multiple_dads(cluster_labels, general_metadata, general_alleles, parent_metadata, parent_alleles, iter)
     # Save to a file
     synthetic_specimens = [[e1, e2] for e1, e2 in zip(result1, result2)]
